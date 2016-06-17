@@ -137,3 +137,16 @@ function callServer() {
 }
 </script>
 ```
+
+# TODO
+
+ * tokens might be retrieved from POSTed form data as well, maybe
+ * check that we get Google certificates before (or as soon as) they start using a new one
+
+# Author
+
+Jacek Kopecky
+
+# License
+
+This project is licensed under the MIT license. See the [LICENSE](LICENSE) file for more info.
