@@ -29,7 +29,57 @@ app.use(googleauth(CLIENT_ID));
 If an ID token is found and successfully parsed, the middleware will add `req.user` like [Passport](http://passportjs.org/docs/profile).
 
 
+## Minimal skeleton of an authenticated web page
+
+Here's what we need to do in a web page to get the user authenticated. This follows a guide from Google: [Integrating Google Sign-In into your web app](https://developers.google.com/identity/sign-in/web/sign-in).
+
+A full working example is included below.
+
+```
+<!doctype html>
+<title>TITLE</title>
+
+<!-- this loads google libraries -->
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<meta name="google-signin-client_id" content="CLIENT_ID">
+
+<!-- this puts a sign-in button, and a sign-out link, in the page -->
+<div class="g-signin2" data-onsuccess="onSignIn"></div>
+<p><a href="#" onclick="signOut();">Sign out</a></p>
+
+<!-- this shows how the page can use the information of the authenticated user
+<script>
+function onSignIn(googleUser) {
+  // do something with the user profile
+}
+
+function signOut() {
+  var auth2 = gapi.auth2.getAuthInstance();
+  auth2.signOut().then(function () {
+    // update your page to show the user's logged out, or redirect elsewhere
+  });
+}
+
+// example that uses a server API and passes it a bearer token
+function callServer() {
+  var id_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', API_ENDPOINT_URL);
+  xhr.setRequestHeader("Authorization", "Bearer " + id_token);
+  xhr.onload = ...;
+  xhr.onerror = ...;
+  xhr.send();
+}
+</script>
+```
+
+
 # Example
+
+Here's a full working example. First, the server that implements an API that needs to securely know users' email addresses; second, the client side.
+
+## Server-side
 
 A full working server (`server.js`) follows:
 
@@ -69,6 +119,8 @@ Save this file as `server.js` and run it with your client ID like this:
 npm install express simple-google-openid
 GOOGLE_CLIENT_ID='XXXX...' node server.js
 ```
+
+## Client-side – the web page in a browser
 
 Now let's make a Web page (`static/index.html`) that authenticates with Google and uses the protected API above. Save this file in `static/index.html` so then you can just start the server above go to [http://localhost:8080/](http://localhost:8080/).
 
