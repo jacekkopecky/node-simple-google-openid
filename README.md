@@ -31,7 +31,7 @@ If an ID token is found and successfully parsed, the middleware will add `req.us
 
 # Example
 
-A full working server follows:
+A full working server (`server.js`) follows:
 
 ```
 var express = require('express');
@@ -51,6 +51,8 @@ app.get('/api/protected', function (req, res) {
   } else {
     res.send('Hello stranger!');
   }
+
+  console.log('successful authorized request by ' + req.user.emails[0].value);
 });
 
 // this will serve the HTML file shown below
@@ -64,10 +66,11 @@ app.listen(8080, function () {
 Save this file as `server.js` and run it with your client ID like this:
 
 ```
+npm install express simple-google-openid
 GOOGLE_CLIENT_ID='XXXX...' node server.js
 ```
 
-Now let's make a Web page that authenticates with Google and uses the protected API above. Save this file in `static/index.html` so then you can just start the server above go to [http://localhost:8080/](http://localhost:8080/).
+Now let's make a Web page (`static/index.html`) that authenticates with Google and uses the protected API above. Save this file in `static/index.html` so then you can just start the server above go to [http://localhost:8080/](http://localhost:8080/).
 
 Don't forget to replace `CLIENT_ID` (on line 4) with your own client ID.
 
