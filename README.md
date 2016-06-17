@@ -72,6 +72,8 @@ GOOGLE_CLIENT_ID='XXXX...' node server.js
 
 Now let's make a Web page (`static/index.html`) that authenticates with Google and uses the protected API above. Save this file in `static/index.html` so then you can just start the server above go to [http://localhost:8080/](http://localhost:8080/).
 
+This follows a guide from Google: [Integrating Google Sign-In into your web app](https://developers.google.com/identity/sign-in/web/sign-in).
+
 Don't forget to replace `CLIENT_ID` (on line 4) with your own client ID.
 
 ```
