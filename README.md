@@ -71,6 +71,8 @@ function callServer() {
   xhr.onerror = ...;
   xhr.send();
 }
+
+// see the complete example below for an extra function that refreshes the token when the computer wakes up from a sleep
 </script>
 ```
 
@@ -187,6 +189,21 @@ function callServer() {
     el.textContent = "Server error:\n" + xhr.responseText;
   }
 }
+
+// react to computer sleeps, get a new token, because it seems gapi doesn't do this reliably
+// adapted from http://stackoverflow.com/questions/4079115/can-any-desktop-browsers-detect-when-the-computer-resumes-from-sleep/4080174#4080174
+(function(){
+  var CHECK_DELAY = 2000;
+  var lastTime = Date.now();
+
+  setInterval(function() {
+    var currentTime = Date.now();
+    if (currentTime > (lastTime + CHECK_DELAY*2)) {  // ignore small delays
+      gapi.auth2.getAuthInstance().currentUser.get().reloadAuthResponse();
+    }
+    lastTime = currentTime;
+  }, CHECK_DELAY);
+})();
 </script>
 ```
 
