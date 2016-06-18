@@ -47,7 +47,7 @@ A full working example is included below.
 <div class="g-signin2" data-onsuccess="onSignIn"></div>
 <p><a href="#" onclick="signOut();">Sign out</a></p>
 
-<!-- this shows how the page can use the information of the authenticated user
+<!-- this shows how the page can use the information of the authenticated user -->
 <script>
 function onSignIn(googleUser) {
   // do something with the user profile
