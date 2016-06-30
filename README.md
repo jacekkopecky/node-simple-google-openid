@@ -209,6 +209,7 @@ function callServer() {
 
 # TODO
 
+ * document `guardMiddleware` which sends 401 Unauthorized if we have no user
  * tokens might be retrieved from POSTed form data as well, maybe
  * check that we get Google certificates before (or as soon as) they start using a new one
 
