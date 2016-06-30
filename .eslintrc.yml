@@ -1,0 +1,16 @@
+extends: airbnb
+plugins:
+  - react
+
+env:
+  node: true
+  browser: false
+
+rules:
+  no-console: off
+  strict: off
+  func-names: off
+  prefer-template: off
+  new-cap: off
+  no-use-before-define: off
+  no-param-reassign: off
