@@ -31,9 +31,7 @@ If an ID token is found and successfully parsed, the middleware will add `req.us
 
 ## Minimal skeleton of an authenticated web page
 
-Here's what we need to do in a web page to get the user authenticated. This follows a guide from Google: [Integrating Google Sign-In into your web app](https://developers.google.com/identity/sign-in/web/sign-in).
-
-A full working example is included below.
+Here's what we need to do in a web page to get the user authenticated. This follows a guide from Google: [Integrating Google Sign-In into your web app](https://developers.google.com/identity/sign-in/web/sign-in). A full working example is included further down on this page.
 
 ```
 <!doctype html>
@@ -47,7 +45,7 @@ A full working example is included below.
 <div class="g-signin2" data-onsuccess="onSignIn"></div>
 <p><a href="#" onclick="signOut();">Sign out</a></p>
 
-<!-- this shows how the page can use the information of the authenticated user
+<!-- this shows how the page can use the information of the authenticated user -->
 <script>
 function onSignIn(googleUser) {
   // do something with the user profile
