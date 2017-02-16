@@ -205,6 +205,10 @@ function callServer() {
 </script>
 ```
 
+# Logging
+
+To enable logging into console output, set the environment variable DEBUG to a non-empty string.
+
 # TODO
 
  * document `guardMiddleware` which sends 401 Unauthorized if we have no user
