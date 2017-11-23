@@ -1,6 +1,6 @@
 {
   "name": "simple-google-openid",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A simple library for using Google as the authenticator of your application's users.",
   "main": "./lib/index",
   "directories": {
