@@ -177,18 +177,16 @@ async function callServer() {
   let fetchOptions = {
     credentials: 'same-origin',
     method: 'GET',
-    headers: { 'Authorization': 'Bearer ' + id_token };
+    headers: { 'Authorization': 'Bearer ' + id_token },
   };
   const response = await fetch('/api/protected', fetchOptions);
   if (!response.ok) {
     // handle the error
-    const el = document.getElementById('server-response');
     el.textContent = "Server error:\n" + response.status;
     return;
   }
 
   // handle the response
-  const el = document.getElementById('server-response');
   const data = await response.text();
   console.log('setting text content: ' + data);
   el.textContent = data;
