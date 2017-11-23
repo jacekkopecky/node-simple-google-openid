@@ -1,7 +1,7 @@
 # node-simple-google-openid
 This is a simple library for using Google as the authenticator of your application's users. All authentication workflows are done in the client's browser; and a [JSON Web Token](https://tools.ietf.org/html/rfc7519) is sent to your server's API.
 
-It makes use of [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken).
+It makes use of [Google Auth Library](https://github.com/google/google-auth-library-nodejs).
 
 
 # Install
@@ -19,7 +19,7 @@ A full working example is included below.
 To add the middleware to your app, you need to give it your CLIENT_ID (see how to [Create a Google Developers Console project and client ID](https://developers.google.com/identity/sign-in/web/devconsole-project)).
 
 ```
-var googleauth = require('simple-google-openid');
+const googleauth = require('simple-google-openid');
 
 …
 
@@ -59,15 +59,20 @@ function signOut() {
 }
 
 // example that uses a server API and passes it a bearer token
-function callServer() {
-  var id_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+async function callServer() {
+  const id_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
 
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', API_ENDPOINT_URL);
-  xhr.setRequestHeader("Authorization", "Bearer " + id_token);
-  xhr.onload = ...;
-  xhr.onerror = ...;
-  xhr.send();
+  let fetchOptions = {
+    credentials: 'same-origin',
+    method: 'GET',
+    headers: { 'Authorization': 'Bearer ' + id_token };
+  };
+  const response = await fetch(API_ENDPOINT_URL, fetchOptions);
+  if (!response.ok) {
+    // handle the error
+    return;
+  }
+  // handle the response
 }
 
 // see the complete example below for an extra function that refreshes the token when the computer wakes up from a sleep
@@ -84,18 +89,19 @@ Here's a full working example. First, the server that implements an API that nee
 A full working server (`server.js`) follows:
 
 ```
-var express = require('express');
-var app = express();
+const express = require('express');
+const app = express();
 
-var googleauth = require('simple-google-openid');
+const googleauth = require('simple-google-openid');
 
 // you can put your client ID here
 app.use(googleauth(process.env.GOOGLE_CLIENT_ID));
 
-app.get('/api/protected', function (req, res) {
-  // return 'Not authorized' if we don't have a user
-  if (!req.user) return res.sendStatus(401);
+// you can put your realm here instead of 'jwt'
+// return 'Not authorized' if we don't have a user
+app.use('/api', googleauth.guardMiddleware({realm: 'jwt'}));
 
+app.get('/api/protected', function (req, res) {
   if (req.user.displayName) {
     res.send('Hello ' + req.user.displayName + '!');
   } else {
@@ -108,8 +114,9 @@ app.get('/api/protected', function (req, res) {
 // this will serve the HTML file shown below
 app.use(express.static('static'));
 
-app.listen(8080, function () {
-  console.log('Example app listening on port 8080!');
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, function () {
+  console.log(`Example app listening on port ${PORT}!`);
 });
 ```
 
@@ -146,46 +153,45 @@ Don't forget to replace `CLIENT_ID` (on line 4) with your own client ID.
 
 <script>
 function onSignIn(googleUser) {
-  var profile = googleUser.getBasicProfile();
-  var el = document.getElementById('greeting');
+  const profile = googleUser.getBasicProfile();
+  const el = document.getElementById('greeting');
   el.textContent = '– Hello ' + profile.getName() + '!';
 
   callServer();
 }
 function signOut() {
-  var auth2 = gapi.auth2.getAuthInstance();
+  const auth2 = gapi.auth2.getAuthInstance();
   auth2.signOut().then(function () {
     console.log('User signed out.');
-    var el = document.getElementById('greeting');
+    const el = document.getElementById('greeting');
     el.textContent = 'Bye!';
   });
 }
 
-function callServer() {
-  var id_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+async function callServer() {
+  const id_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
 
-  var el = document.getElementById('server-response');
+  const el = document.getElementById('server-response');
   el.textContent = 'loading…';
 
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', '/api/protected');
-  xhr.setRequestHeader("Authorization", "Bearer " + id_token);
-  xhr.onload = processServerResponse;
-  xhr.onerror = serverError;
-  xhr.send();
-
-  function processServerResponse() {
-    if (xhr.status >= 400) return serverError();
-
-    var el = document.getElementById('server-response');
-    console.log('setting text content: ' + xhr.responseText);
-    el.textContent = xhr.responseText;
+  let fetchOptions = {
+    credentials: 'same-origin',
+    method: 'GET',
+    headers: { 'Authorization': 'Bearer ' + id_token };
+  };
+  const response = await fetch('/api/protected', fetchOptions);
+  if (!response.ok) {
+    // handle the error
+    const el = document.getElementById('server-response');
+    el.textContent = "Server error:\n" + response.status;
+    return;
   }
 
-  function serverError() {
-    var el = document.getElementById('server-response');
-    el.textContent = "Server error:\n" + xhr.responseText;
-  }
+  // handle the response
+  const el = document.getElementById('server-response');
+  const data = await response.text();
+  console.log('setting text content: ' + data);
+  el.textContent = data;
 }
 
 // react to computer sleeps, get a new token, because it seems gapi doesn't do this reliably
@@ -211,9 +217,8 @@ To enable logging into console output, set the environment variable DEBUG to a n
 
 # TODO
 
- * document `guardMiddleware` which sends 401 Unauthorized if we have no user
+ * document `guardMiddleware` which sends 401 Unauthorized if we have no user, shown in the code above
  * tokens might be retrieved from POSTed form data as well, maybe
- * check that we get Google certificates before (or as soon as) they start using a new one
 
 # Author
 
