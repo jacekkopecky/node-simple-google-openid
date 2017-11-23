@@ -65,7 +65,7 @@ async function callServer() {
   let fetchOptions = {
     credentials: 'same-origin',
     method: 'GET',
-    headers: { 'Authorization': 'Bearer ' + id_token };
+    headers: { 'Authorization': 'Bearer ' + id_token },
   };
   const response = await fetch(API_ENDPOINT_URL, fetchOptions);
   if (!response.ok) {
