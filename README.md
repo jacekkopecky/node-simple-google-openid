@@ -6,7 +6,7 @@ It makes use of [Google Auth Library](https://github.com/google/google-auth-libr
 
 # Install
 
-```
+```bash
 npm install simple-google-openid
 ```
 
@@ -18,7 +18,7 @@ A full working example is included below.
 
 To add the middleware to your app, you need to give it your CLIENT_ID (see how to [Create a Google Developers Console project and client ID](https://developers.google.com/identity/sign-in/web/devconsole-project)).
 
-```
+```javascript
 const googleauth = require('simple-google-openid');
 
 …
@@ -33,7 +33,7 @@ If an ID token is found and successfully parsed, the middleware will add `req.us
 
 Here's what we need to do in a web page to get the user authenticated. This follows a guide from Google: [Integrating Google Sign-In into your web app](https://developers.google.com/identity/sign-in/web/sign-in). A full working example is included further down on this page.
 
-```
+```html
 <!doctype html>
 <title>TITLE</title>
 
@@ -88,7 +88,7 @@ Here's a full working example. First, the server that implements an API that nee
 
 A full working server (`server.js`) follows:
 
-```
+```javascript
 const express = require('express');
 const app = express();
 
@@ -122,7 +122,7 @@ app.listen(PORT, function () {
 
 Save this file as `server.js` and run it with your client ID like this:
 
-```
+```bash
 npm install express simple-google-openid
 GOOGLE_CLIENT_ID='XXXX...' node server.js
 ```
@@ -135,7 +135,7 @@ This follows a guide from Google: [Integrating Google Sign-In into your web app]
 
 Don't forget to replace `CLIENT_ID` (on line 4) with your own client ID.
 
-```
+```html
 <!doctype html>
 <title>Simple Google Auth test</title>
 <script src="https://apis.google.com/js/platform.js" async defer></script>
