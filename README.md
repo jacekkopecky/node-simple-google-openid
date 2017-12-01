@@ -1,10 +1,19 @@
 # node-simple-google-openid
-This is a simple library for using Google as the authenticator of your application's users. All authentication workflows are done in the client's browser; and a [JSON Web Token](https://tools.ietf.org/html/rfc7519) is sent to your server's API.
+This is a simple library providing two Express.js middlewares for using Google
+as the authenticator of your application's users.
 
-It makes use of [Google Auth Library](https://github.com/google/google-auth-library-nodejs).
+All authentication workflows are done in the client's browser;
+to authenticate with a server, the browser sends a
+[JSON Web Token](https://tools.ietf.org/html/rfc7519) to your server's API.
+
+In the server, this package will add `req.user` structured like a
+[Passport Profile](http://passportjs.org/docs/profile).
+
+This package makes use of
+[Google Auth Library](https://github.com/google/google-auth-library-nodejs).
 
 
-# Install
+# Installation
 
 ```bash
 npm install simple-google-openid
@@ -12,26 +21,46 @@ npm install simple-google-openid
 
 # Usage
 
-The library provides an Express middleware that will take an ID token from the URL query (parameter `id_token`) or from a bearer token (HTTP header `Authorization: Bearer TOKEN`).
+First, this package provides an Express.js _middleware_ that will take an
+ID token from the URL query (parameter `id_token`) or from a bearer token
+(HTTP header `Authorization: Bearer TOKEN`).
 
+
+To add the middleware to your app, you need to give it your CLIENT_ID
+(see [Create a Google Developers Console project and client
+ID](https://developers.google.com/identity/sign-in/web/devconsole-project)).
 A full working example is included below.
 
-To add the middleware to your app, you need to give it your CLIENT_ID (see how to [Create a Google Developers Console project and client ID](https://developers.google.com/identity/sign-in/web/devconsole-project)).
-
 ```javascript
-const googleauth = require('simple-google-openid');
+const GoogleAuth = require('simple-google-openid');
 
 …
 
-app.use(googleauth(CLIENT_ID));
+app.use(GoogleAuth(CLIENT_ID));
 ```
 
-If an ID token is found and successfully parsed, the middleware will add `req.user` like [Passport](http://passportjs.org/docs/profile).
+If an ID token is found and successfully parsed, the middleware will add
+`req.user` like [Passport Profile](http://passportjs.org/docs/profile).
+
+To require authentication for a part of your app (e.g. `/api/*`),
+you can use the `guardMiddleware`; this will ensure that the app returns
+401 Unauthorized on requests without an authentication token.
+
+```javascript
+app.use('/api', GoogleAuth.guardMiddleware({ realm: 'jwt' }));
+// you can put your realm here instead of 'jwt'
+```
+
+**This package does not provide any authorization – `guardMiddleware` lets in
+any signed-in Google user. Your app needs to provide authorization logic.**
 
 
 ## Minimal skeleton of an authenticated web page
 
-Here's what we need to do in a web page to get the user authenticated. This follows a guide from Google: [Integrating Google Sign-In into your web app](https://developers.google.com/identity/sign-in/web/sign-in). A full working example is included further down on this page.
+Here's what we need to do in a web page to get the user authenticated.
+This follows a guide from Google: [Integrating Google Sign-In into your
+web app](https://developers.google.com/identity/sign-in/web/sign-in).
+A full working example is included further down on this page.
 
 ```html
 <!doctype html>
@@ -51,18 +80,16 @@ function onSignIn(googleUser) {
   // do something with the user profile
 }
 
-function signOut() {
-  var auth2 = gapi.auth2.getAuthInstance();
-  auth2.signOut().then(function () {
-    // update your page to show the user's logged out, or redirect elsewhere
-  });
+async function signOut() {
+  await gapi.auth2.getAuthInstance().signOut();
+  // update your page to show the user's logged out, or redirect elsewhere
 }
 
 // example that uses a server API and passes it a bearer token
 async function callServer() {
   const id_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
 
-  let fetchOptions = {
+  const fetchOptions = {
     credentials: 'same-origin',
     method: 'GET',
     headers: { 'Authorization': 'Bearer ' + id_token },
@@ -82,7 +109,8 @@ async function callServer() {
 
 # Example
 
-Here's a full working example. First, the server that implements an API that needs to securely know users' email addresses; second, the client side.
+Here's a full working example. First, the server that implements an API that
+needs to securely know users' email addresses; second, the client side.
 
 ## Server-side
 
@@ -92,30 +120,29 @@ A full working server (`server.js`) follows:
 const express = require('express');
 const app = express();
 
-const googleauth = require('simple-google-openid');
+const GoogleAuth = require('simple-google-openid');
 
 // you can put your client ID here
-app.use(googleauth(process.env.GOOGLE_CLIENT_ID));
+app.use(GoogleAuth(process.env.GOOGLE_CLIENT_ID));
 
-// you can put your realm here instead of 'jwt'
 // return 'Not authorized' if we don't have a user
-app.use('/api', googleauth.guardMiddleware({realm: 'jwt'}));
+app.use('/api', GoogleAuth.guardMiddleware({ realm: 'jwt' }));
 
-app.get('/api/protected', function (req, res) {
+app.get('/api/hello', (req, res) => {
   if (req.user.displayName) {
     res.send('Hello ' + req.user.displayName + '!');
   } else {
-    res.send('Hello stranger!');
+    res.send('Hello user without a name!');
   }
 
-  console.log('successful authorized request by ' + req.user.emails[0].value);
+  console.log('successful authenticated request by ' + req.user.emails[0].value);
 });
 
 // this will serve the HTML file shown below
 app.use(express.static('static'));
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, function () {
+app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 ```
@@ -129,9 +156,13 @@ GOOGLE_CLIENT_ID='XXXX...' node server.js
 
 ## Client-side – the web page in a browser
 
-Now let's make a Web page (`static/index.html`) that authenticates with Google and uses the protected API above. Save this file in `static/index.html` so then you can just start the server above go to [http://localhost:8080/](http://localhost:8080/).
+Now let's make a Web page (`static/index.html`) that authenticates with Google
+and uses the API above. Save this file in `static/index.html`,
+start the server above, and go to
+[http://localhost:8080/](http://localhost:8080/).
 
-This follows a guide from Google: [Integrating Google Sign-In into your web app](https://developers.google.com/identity/sign-in/web/sign-in).
+This follows a guide from Google: [Integrating Google Sign-In into your web
+app](https://developers.google.com/identity/sign-in/web/sign-in).
 
 Don't forget to replace `CLIENT_ID` (on line 4) with your own client ID.
 
@@ -159,27 +190,25 @@ function onSignIn(googleUser) {
 
   callServer();
 }
-function signOut() {
-  const auth2 = gapi.auth2.getAuthInstance();
-  auth2.signOut().then(function () {
-    console.log('User signed out.');
-    const el = document.getElementById('greeting');
-    el.textContent = 'Bye!';
-  });
+async function signOut() {
+  await gapi.auth2.getAuthInstance().signOut();
+  console.log('User signed out.');
+  const el = document.getElementById('greeting');
+  el.textContent = 'Bye!';
 }
 
 async function callServer() {
-  const id_token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+  const token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
 
   const el = document.getElementById('server-response');
   el.textContent = 'loading…';
 
-  let fetchOptions = {
+  const fetchOptions = {
     credentials: 'same-origin',
     method: 'GET',
-    headers: { 'Authorization': 'Bearer ' + id_token },
+    headers: { 'Authorization': 'Bearer ' + token },
   };
-  const response = await fetch('/api/protected', fetchOptions);
+  const response = await fetch('/api/hello', fetchOptions);
   if (!response.ok) {
     // handle the error
     el.textContent = "Server error:\n" + response.status;
@@ -192,31 +221,33 @@ async function callServer() {
   el.textContent = data;
 }
 
-// react to computer sleeps, get a new token, because it seems gapi doesn't do this reliably
+// react to computer sleeps, get a new token; gapi doesn't do this reliably
 // adapted from http://stackoverflow.com/questions/4079115/can-any-desktop-browsers-detect-when-the-computer-resumes-from-sleep/4080174#4080174
-(function(){
-  var CHECK_DELAY = 2000;
-  var lastTime = Date.now();
+(function () {
+  const CHECK_DELAY = 2000;
+  let lastTime = Date.now();
 
-  setInterval(function() {
-    var currentTime = Date.now();
+  setInterval(() => {
+    const currentTime = Date.now();
     if (currentTime > (lastTime + CHECK_DELAY*2)) {  // ignore small delays
       gapi.auth2.getAuthInstance().currentUser.get().reloadAuthResponse();
     }
     lastTime = currentTime;
   }, CHECK_DELAY);
-})();
+}());
 </script>
 ```
 
 # Logging
 
-To enable logging into console output, set the environment variable DEBUG to a non-empty string.
+To enable logging into console output, set the environment variable DEBUG
+to a non-empty string.
 
 # TODO
 
- * document `guardMiddleware` which sends 401 Unauthorized if we have no user, shown in the code above
  * tokens might be retrieved from POSTed form data as well, maybe
+ * use https://www.npmjs.com/package/express-bearer-token
+ * tests
 
 # Author
 
@@ -224,4 +255,5 @@ Jacek Kopecky
 
 # License
 
-This project is licensed under the MIT license. See the [LICENSE](LICENSE) file for more info.
+This project is licensed under the MIT license. See the [LICENSE](LICENSE)
+file for more info.
