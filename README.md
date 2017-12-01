@@ -7,7 +7,7 @@ to authenticate with a server, the browser sends a
 [JSON Web Token](https://tools.ietf.org/html/rfc7519) to your server's API.
 
 In the server, this package will add `req.user` structured like a
-[Passport Profile](http://passportjs.org/docs/profile).
+[Passport User Profile](http://passportjs.org/docs/profile).
 
 This package makes use of
 [Google Auth Library](https://github.com/google/google-auth-library-nodejs).
@@ -40,7 +40,7 @@ app.use(GoogleAuth(CLIENT_ID));
 ```
 
 If an ID token is found and successfully parsed, the middleware will add
-`req.user` like [Passport Profile](http://passportjs.org/docs/profile).
+`req.user` like [Passport User Profile](http://passportjs.org/docs/profile).
 
 To require authentication for a part of your app (e.g. `/api/*`),
 you can use the `guardMiddleware`; this will ensure that the app returns
