@@ -150,6 +150,7 @@ app.listen(PORT, () => {
 Save this file as `server.js` and run it with your client ID like this:
 
 ```bash
+npm init -y
 npm install express simple-google-openid
 GOOGLE_CLIENT_ID='XXXX...' node server.js
 ```
