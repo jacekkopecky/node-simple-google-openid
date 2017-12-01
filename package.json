@@ -3,9 +3,6 @@
   "version": "0.0.11",
   "description": "A simple library for using Google as the authenticator of your application's users.",
   "main": "./lib/index",
-  "directories": {
-    "example": "example"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,7 +14,7 @@
     "Node.js",
     "Google",
     "OpenID",
-    "Express"
+    "Express.js"
   ],
   "dependencies": {
     "google-auth-library": "^0.12.0"
@@ -29,7 +26,7 @@
     "eslint-plugin-import": "^1.7.0",
     "eslint-plugin-jsx-a11y": "^1.2.0"
   },
-  "author": "Jacek Kopecky",
+  "author": "Jacek Kopecky <jacek@jacek.cz>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/jacekkopecky/node-simple-google-openid/issues"
