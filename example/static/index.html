@@ -1,0 +1,69 @@
+<!doctype html>
+<title>Simple Google Auth test</title>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<meta name="google-signin-client_id" content="CLIENT_ID">
+
+
+<h1>Simple Google Auth test <span id="greeting"></span></h1>
+
+<p>Press the button below to sign in:</p>
+<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+<p><a href="#" onclick="signOut();">Sign out</a></p>
+
+<p>Below is the response from the server API: <button onclick="callServer()">refresh</button>
+<pre id="server-response" style="border: 1px dashed black; min-width: 10em; min-height: 1em; padding: .5em;"></pre>
+
+<script>
+function onSignIn(googleUser) {
+  const profile = googleUser.getBasicProfile();
+  const el = document.getElementById('greeting');
+  el.textContent = '– Hello ' + profile.getName() + '!';
+
+  callServer();
+}
+async function signOut() {
+  await gapi.auth2.getAuthInstance().signOut();
+  console.log('User signed out.');
+  const el = document.getElementById('greeting');
+  el.textContent = 'Bye!';
+}
+
+async function callServer() {
+  const token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+
+  const el = document.getElementById('server-response');
+  el.textContent = 'loading…';
+
+  const fetchOptions = {
+    credentials: 'same-origin',
+    method: 'GET',
+    headers: { 'Authorization': 'Bearer ' + token },
+  };
+  const response = await fetch('/api/hello', fetchOptions);
+  if (!response.ok) {
+    // handle the error
+    el.textContent = "Server error:\n" + response.status;
+    return;
+  }
+
+  // handle the response
+  const data = await response.text();
+  console.log('setting text content: ' + data);
+  el.textContent = data;
+}
+
+// react to computer sleeps, get a new token; gapi doesn't do this reliably
+// adapted from http://stackoverflow.com/questions/4079115/can-any-desktop-browsers-detect-when-the-computer-resumes-from-sleep/4080174#4080174
+(function () {
+  const CHECK_DELAY = 2000;
+  let lastTime = Date.now();
+
+  setInterval(() => {
+    const currentTime = Date.now();
+    if (currentTime > (lastTime + CHECK_DELAY*2)) {  // ignore small delays
+      gapi.auth2.getAuthInstance().currentUser.get().reloadAuthResponse();
+    }
+    lastTime = currentTime;
+  }, CHECK_DELAY);
+}());
+</script>

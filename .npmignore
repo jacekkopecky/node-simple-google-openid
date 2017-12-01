@@ -1,4 +1,4 @@
 node_modules
 *.bak
-example-server.js
-static
+example
+.eslintrc.yml
