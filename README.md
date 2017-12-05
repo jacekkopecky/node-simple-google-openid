@@ -12,6 +12,11 @@ In the server, this package will add `req.user` structured like a
 This package makes use of
 [Google Auth Library](https://github.com/google/google-auth-library-nodejs).
 
+### Status
+
+- works for me, does what I need
+- let me know if it doesn't work for you or if you'd like any new functionality
+
 
 # Installation
 
