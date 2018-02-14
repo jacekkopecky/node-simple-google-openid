@@ -52,8 +52,7 @@ you can use the `guardMiddleware`; this will ensure that the app returns
 401 Unauthorized on requests without an authentication token.
 
 ```javascript
-app.use('/api', GoogleAuth.guardMiddleware({ realm: 'jwt' }));
-// you can put your realm here instead of 'jwt'
+app.use('/api', GoogleAuth.guardMiddleware());
 ```
 
 **This package does not provide any authorization – `guardMiddleware` lets in
@@ -131,7 +130,7 @@ const GoogleAuth = require('simple-google-openid');
 app.use(GoogleAuth(process.env.GOOGLE_CLIENT_ID));
 
 // return 'Not authorized' if we don't have a user
-app.use('/api', GoogleAuth.guardMiddleware({ realm: 'jwt' }));
+app.use('/api', GoogleAuth.guardMiddleware());
 
 app.get('/api/hello', (req, res) => {
   if (req.user.displayName) {
