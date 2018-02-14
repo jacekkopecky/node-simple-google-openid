@@ -133,11 +133,7 @@ app.use(GoogleAuth(process.env.GOOGLE_CLIENT_ID));
 app.use('/api', GoogleAuth.guardMiddleware());
 
 app.get('/api/hello', (req, res) => {
-  if (req.user.displayName) {
-    res.send('Hello ' + req.user.displayName + '!');
-  } else {
-    res.send('Hello user without a name!');
-  }
+  res.send('Hello ' + (req.user.displayName || 'user without a name') + '!');
 
   console.log('successful authenticated request by ' + req.user.emails[0].value);
 });
