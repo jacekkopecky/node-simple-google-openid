@@ -6,6 +6,7 @@
   - without CLIENT ID, the server would accept ID tokens for any app, not just for yours
   - so any app owner could impersonate their users in your app
 - 0.2.1: added status to README
+- 0.2.2: made realm optional for guardMiddleware, and simplified docs
 
 ## 0.1.0
 
