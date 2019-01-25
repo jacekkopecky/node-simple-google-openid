@@ -4,7 +4,8 @@
   "description": "A simple library for using Google as the authenticator of your application's users.",
   "main": "./lib/index",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint lib"
   },
   "repository": {
     "type": "git",
@@ -20,11 +21,11 @@
     "google-auth-library": "^0.12.0"
   },
   "devDependencies": {
-    "eslint": "^2.13.1",
-    "eslint-config-airbnb": "^9.0.1",
-    "eslint-plugin-react": "^5.0.1",
-    "eslint-plugin-import": "^1.7.0",
-    "eslint-plugin-jsx-a11y": "^1.2.0"
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.8.1"
   },
   "author": "Jacek Kopecky <jacek@jacek.cz>",
   "license": "MIT",
