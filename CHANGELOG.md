@@ -1,5 +1,9 @@
 # Change log
 
+## 0.3.x
+
+- add `verifyToken()`
+
 ## 0.2.x
 
 - made CLIENT ID required (changed default behaviour)

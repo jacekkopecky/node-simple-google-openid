@@ -26,6 +26,8 @@ npm install simple-google-openid
 
 # Usage
 
+## Express middleware for authentication
+
 First, this package provides an Express.js _middleware_ that will take an
 ID token from the URL query (parameter `id_token`) or from a bearer token
 (HTTP header `Authorization: Bearer TOKEN`).
@@ -47,6 +49,8 @@ app.use(GoogleAuth(CLIENT_ID));
 If an ID token is found and successfully parsed, the middleware will add
 `req.user` like [Passport User Profile](http://passportjs.org/docs/profile).
 
+## How to require authentication
+
 To require authentication for a part of your app (e.g. `/api/*`),
 you can use the `guardMiddleware`; this will ensure that the app returns
 401 Unauthorized on requests without an authentication token.
@@ -57,6 +61,36 @@ app.use('/api', GoogleAuth.guardMiddleware());
 
 **This package does not provide any authorization – `guardMiddleware` lets in
 any signed-in Google user. Your app needs to provide authorization logic.**
+
+## Verifying tokens
+
+If you get ID tokens outside of the `Authorization` header (e.g. as part of WebSocket messages), you can verify them and get the user information using the `verifyToken()` function that returns a Promise.
+
+Using await/async:
+
+```javascript
+const auth = GoogleAuth(CLIENT_ID);
+
+…
+
+const token = ...; // get token from somewhere
+const user = await auth.verifyToken(token);
+if (!user) ...; // token was not valid (e.g. expired)
+```
+
+Using `.then()`:
+
+```javascript
+const auth = GoogleAuth(CLIENT_ID);
+
+…
+
+const token = ...; // get token from somewhere
+auth.verifyToken(token)
+  .then((user) => {
+    if (!user) ...; // token was not valid (e.g. expired)
+  });
+```
 
 
 ## Minimal skeleton of an authenticated web page
