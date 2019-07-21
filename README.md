@@ -62,9 +62,19 @@ app.use('/api', GoogleAuth.guardMiddleware());
 **This package does not provide any authorization – `guardMiddleware` lets in
 any signed-in Google user. Your app needs to provide authorization logic.**
 
+## Use outside of Express.js
+
+To get a token from the `Authorization` header in an HTTP request, you can use the `getAuthToken()` function:
+
+```javascript
+const token = getAuthToken(req);
+```
+
+Then to verify it, read on.
+
 ## Verifying tokens
 
-If you get ID tokens outside of the `Authorization` header (e.g. as part of WebSocket messages), you can verify them and get the user information using the `verifyToken()` function that returns a Promise.
+If you get ID tokens with `getAuthToken()` or some other way outside of the `Authorization` header (e.g. as part of WebSocket messages), you can verify them and get the user information using the `verifyToken()` function that returns a Promise.
 
 Using await/async:
 
