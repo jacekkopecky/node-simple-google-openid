@@ -233,7 +233,7 @@ function onSignIn(googleUser) {
   const el = document.getElementById('greeting');
   el.textContent = '– Hello ' + profile.getName() + '!';
 
-  callServer();
+  setTimeout(callServer, 100);
 }
 async function signOut() {
   await gapi.auth2.getAuthInstance().signOut();
