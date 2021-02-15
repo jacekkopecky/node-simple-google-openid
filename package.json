@@ -4,10 +4,10 @@
   "description": "A simple library for using Google as the authenticator of your application's users.",
   "main": "./lib/index",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint lib",
+    "test": "echo \"WARNING: no test specified\"; npm run lint && npm run build",
+    "lint": "eslint lib --ext ts --ignore-pattern \\*.d.ts",
     "build": "tsc",
-    "prepublishOnly": "npm run lint && npm run build"
+    "prepublishOnly": "npm test"
   },
   "repository": {
     "type": "git",

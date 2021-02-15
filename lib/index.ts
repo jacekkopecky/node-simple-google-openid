@@ -76,8 +76,8 @@ export default function initialize(clientId: string): SimpleGoogleOpenID {
  * 401 Unauthorized
  * WWW-Authenticate: Bearer realm="example"
  */
-export function guardMiddleware(options: GuardMiddlewareOptions = {}): RequestHandler {
-  const realm = options.realm ?? 'jwt';
+export function guardMiddleware(options?: GuardMiddlewareOptions): RequestHandler {
+  const realm = options?.realm ?? 'jwt';
   if (realm.indexOf('"') >= 0) {
     throw new Error('authentication realm must not contain a double quote!');
   }
