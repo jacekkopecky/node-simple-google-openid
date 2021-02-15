@@ -1,5 +1,9 @@
 # Change log
 
+## 0.4.x
+
+- converted to typescript
+
 ## 0.3.x
 
 - add `verifyToken()`
