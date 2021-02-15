@@ -5,7 +5,9 @@
   "main": "./lib/index",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint lib"
+    "lint": "eslint lib",
+    "build": "tsc",
+    "prepublishOnly": "npm run lint && npm run build"
   },
   "repository": {
     "type": "git",

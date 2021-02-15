@@ -1,2 +1,5 @@
 node_modules
 *.bak
+lib/*.js
+lib/*.map
+lib/*.d.ts
