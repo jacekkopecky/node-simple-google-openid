@@ -9,18 +9,30 @@
 
 'use strict';
 
-const GoogleAuth = require('google-auth-library');
-const profile = require('./profile');
-const log = require('./log');
+import GoogleAuth from 'google-auth-library';
+import * as profile from './profile.js';
+import log from './log.js';
+
+import type { RequestHandler, Request } from 'express';
+import type { Profile } from 'passport';
 
 const auth = new GoogleAuth.OAuth2Client();
 
-function initialize(clientId) {
+export interface GuardMiddlewareOptions {
+  realm?: string,
+}
+
+export interface SimpleGoogleOpenID extends RequestHandler {
+  guardMiddleware: (opts?: GuardMiddlewareOptions) => RequestHandler,
+  verifyToken: (token: string) => Promise<Profile | undefined>;
+}
+
+export default function initialize(clientId: string): SimpleGoogleOpenID {
   if (!clientId) {
     throw new Error('CLIENT ID is required: checking JWT without a CLIENT ID is insecure!');
   }
 
-  const verifyToken = async (idToken) => {
+  const verifyToken = async (idToken: string) => {
     try {
       const verifyOptions = {
         idToken,
@@ -28,15 +40,17 @@ function initialize(clientId) {
       };
       const login = await auth.verifyIdToken(verifyOptions);
       const payload = login.getPayload();
+      if (!payload) throw new Error('null payload in JWT token');
+
       log('payload', JSON.stringify(payload, null, 2));
       return profile.parse(payload);
     } catch (e) {
       log('error verifying token', e);
-      return null;
+      return undefined;
     }
   };
 
-  const middleware = async function SimpleGoogleOpenIDMiddleware(req, res, next) {
+  const middleware: SimpleGoogleOpenID = async function SimpleGoogleOpenIDMiddleware(req, res, next) {
     if (req.user) {
       next();
       return;
@@ -52,18 +66,18 @@ function initialize(clientId) {
 
   middleware.guardMiddleware = guardMiddleware;
   middleware.verifyToken = verifyToken;
+
   return middleware;
-};
+}
+
 
 /*
  * middleware that requires req.user to exist, otherwise returns
  * 401 Unauthorized
  * WWW-Authenticate: Bearer realm="example"
  */
-function guardMiddleware(options) {
-  options = options || {};
-
-  const realm = options.realm || 'jwt';
+export function guardMiddleware(options: GuardMiddlewareOptions = {}): RequestHandler {
+  const realm = options.realm ?? 'jwt';
   if (realm.indexOf('"') >= 0) {
     throw new Error('authentication realm must not contain a double quote!');
   }
@@ -80,7 +94,7 @@ function guardMiddleware(options) {
 
 
 // adapted from https://github.com/auth0/express-jwt/blob/4861bbb9d906f8fbd8c494fe2dbc4fda0d7865c6/lib/index.js#L62-70
-function getAuthToken(req) {
+export function getAuthToken(req: Request): string | undefined {
   let token;
   if (req.headers && req.headers.authorization) {
     const parts = req.headers.authorization.split(' ');
@@ -94,13 +108,9 @@ function getAuthToken(req) {
     }
   }
 
-  if (!token && req.query.id_token) {
+  if (!token && typeof req.query.id_token === 'string') {
     token = req.query.id_token;
   }
 
   return token;
 }
-
-module.exports = initialize;
-module.exports.guardMiddleware = guardMiddleware;
-module.exports.getAuthToken = getAuthToken;
