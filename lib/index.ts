@@ -9,7 +9,7 @@
 
 'use strict';
 
-import GoogleAuth from 'google-auth-library';
+import * as GoogleAuth from 'google-auth-library';
 import * as profile from './profile.js';
 import log from './log.js';
 
@@ -18,16 +18,16 @@ import type { Profile } from 'passport';
 
 const auth = new GoogleAuth.OAuth2Client();
 
-export interface GuardMiddlewareOptions {
+interface GuardMiddlewareOptions {
   realm?: string,
 }
 
-export interface SimpleGoogleOpenID extends RequestHandler {
+interface SimpleGoogleOpenID extends RequestHandler {
   guardMiddleware: (opts?: GuardMiddlewareOptions) => RequestHandler,
   verifyToken: (token: string) => Promise<Profile | undefined>;
 }
 
-export default function initialize(clientId: string): SimpleGoogleOpenID {
+function initialize(clientId: string): SimpleGoogleOpenID {
   if (!clientId) {
     throw new Error('CLIENT ID is required: checking JWT without a CLIENT ID is insecure!');
   }
@@ -70,13 +70,12 @@ export default function initialize(clientId: string): SimpleGoogleOpenID {
   return middleware;
 }
 
-
 /*
  * middleware that requires req.user to exist, otherwise returns
  * 401 Unauthorized
  * WWW-Authenticate: Bearer realm="example"
  */
-export function guardMiddleware(options?: GuardMiddlewareOptions): RequestHandler {
+function guardMiddleware(options?: GuardMiddlewareOptions): RequestHandler {
   const realm = options?.realm ?? 'jwt';
   if (realm.indexOf('"') >= 0) {
     throw new Error('authentication realm must not contain a double quote!');
@@ -92,9 +91,11 @@ export function guardMiddleware(options?: GuardMiddlewareOptions): RequestHandle
   };
 }
 
+initialize.guardMiddleware = guardMiddleware;
+
 
 // adapted from https://github.com/auth0/express-jwt/blob/4861bbb9d906f8fbd8c494fe2dbc4fda0d7865c6/lib/index.js#L62-70
-export function getAuthToken(req: Request): string | undefined {
+function getAuthToken(req: Request): string | undefined {
   let token;
   if (req.headers && req.headers.authorization) {
     const parts = req.headers.authorization.split(' ');
@@ -114,3 +115,5 @@ export function getAuthToken(req: Request): string | undefined {
 
   return token;
 }
+
+export = initialize;

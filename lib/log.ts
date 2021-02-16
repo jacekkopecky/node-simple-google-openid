@@ -3,7 +3,7 @@
 
 'use strict';
 
-import metadata from '../package.json';
+import * as metadata from '../package.json';
 
 let log: (...args: unknown[]) => void;
 
