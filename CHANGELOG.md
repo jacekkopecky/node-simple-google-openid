@@ -1,5 +1,9 @@
 # Change log
 
+## 0.4.1 same as 0.3.2
+
+- reverts breaking typescript changes
+
 ## 0.3.x
 
 - add `verifyToken()`
