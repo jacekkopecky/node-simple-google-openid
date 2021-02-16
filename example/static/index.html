@@ -14,22 +14,23 @@
 <pre id="server-response" style="border: 1px dashed black; min-width: 10em; min-height: 1em; padding: .5em;"></pre>
 
 <script>
-function onSignIn(googleUser) {
+window.onSignIn = function (googleUser) {
   const profile = googleUser.getBasicProfile();
   const el = document.getElementById('greeting');
   el.textContent = '– Hello ' + profile.getName() + '!';
 
   callServer();
-}
-async function signOut() {
-  await gapi.auth2.getAuthInstance().signOut();
+};
+
+window.signOut = async function () {
+  await window.gapi.auth2.getAuthInstance().signOut();
   console.log('User signed out.');
   const el = document.getElementById('greeting');
   el.textContent = 'Bye!';
-}
+};
 
 async function callServer() {
-  const token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+  const token = window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
 
   const el = document.getElementById('server-response');
   el.textContent = 'loading…';
@@ -37,12 +38,12 @@ async function callServer() {
   const fetchOptions = {
     credentials: 'same-origin',
     method: 'GET',
-    headers: { 'Authorization': 'Bearer ' + token },
+    headers: { Authorization: 'Bearer ' + token },
   };
   const response = await fetch('/api/hello', fetchOptions);
   if (!response.ok) {
     // handle the error
-    el.textContent = "Server error:\n" + response.status;
+    el.textContent = 'Server error:\n' + response.status;
     return;
   }
 
@@ -60,8 +61,8 @@ async function callServer() {
 
   setInterval(() => {
     const currentTime = Date.now();
-    if (currentTime > (lastTime + CHECK_DELAY*2)) {  // ignore small delays
-      gapi.auth2.getAuthInstance().currentUser.get().reloadAuthResponse();
+    if (currentTime > (lastTime + CHECK_DELAY * 2)) { // ignore small delays
+      window.gapi.auth2.getAuthInstance().currentUser.get().reloadAuthResponse();
     }
     lastTime = currentTime;
   }, CHECK_DELAY);

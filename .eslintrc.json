@@ -4,8 +4,7 @@
     "es6": true
   },
   "ignorePatterns": [
-    "node_modules",
-    "app"
+    "node_modules"
   ],
   "plugins": [
     "@typescript-eslint"

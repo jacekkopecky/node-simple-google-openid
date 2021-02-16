@@ -4,13 +4,19 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "npm run lint",
+    "start": "node server.js",
+    "lint": "eslint server.js static/index.html"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.20.0",
+    "eslint-config-portsoc": "^0.8.1",
+    "eslint-plugin-html": "^6.1.1"
   }
 }
